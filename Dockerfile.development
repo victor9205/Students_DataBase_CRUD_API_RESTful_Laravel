@@ -1,0 +1,36 @@
+FROM php:8.0
+
+RUN  apt-get update -y && apt-get install libzip-dev libmongoc-1.0-0 libpq-dev libicu-dev  git gzip zip unzip -y libxml2-dev libgmp-dev re2c libmhash-dev libmcrypt-dev file\
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && docker-php-ext-install mysqli \
+    && docker-php-ext-install pdo_mysql \
+    && docker-php-ext-install soap \
+    && ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/local/include/ \
+    && docker-php-ext-configure gmp \
+    && docker-php-ext-install gmp \
+    && docker-php-ext-configure zip \
+    && docker-php-ext-install zip \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install intl 
+
+RUN apt-get install -y libcurl4-openssl-dev pkg-config libssl-dev
+#RUN pecl install mongodb && docker-php-ext-enable mongodb
+RUN pecl config-set php_ini /etc/php.ini
+RUN echo 'memory_limit = -1' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini;
+
+RUN mkdir /Projetos
+WORKDIR /Projetos
+
+# ARG user e ARG uid estão no docker-compose.development
+#Adicionar permissões ao usuário dentro do docker baseados nas mesmas permissões da máquina local
+ARG user
+ARG uid
+RUN useradd -G www-data,root -u $uid -d /home/$user $user
+RUN mkdir -p /home/$user/.composer && \
+    chown -R $user:$user /home/$user
+USER $user
+#Fim adicionar permissoes
+
+CMD php artisan cache:clear && php artisan serve --host 0.0.0.0
+
+EXPOSE 8000 
