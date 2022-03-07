@@ -22,5 +22,5 @@ services:
         links: 
             - mysql 
         tty: true
-        container_name: "estudos"
+        container_name: "Students_DataBase_CRUD_API_RESTful_Laravel"
             

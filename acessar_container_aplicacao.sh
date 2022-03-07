@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker exec -it estudos bash
+docker exec -it Students_DataBase_CRUD_API_RESTful_Laravel bash
